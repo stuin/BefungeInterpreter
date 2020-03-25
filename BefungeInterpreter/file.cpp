@@ -129,7 +129,7 @@ std::string File::getFilename()
     return filename;
 }
 
-std::__cxx11::string File::getFilepath()
+std::string File::getFilepath()
 {
     return filepath;
 }
