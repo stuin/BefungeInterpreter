@@ -265,42 +265,37 @@ char MainWindow::inputChar()
     ui->LFButton->setEnabled(true);
 
     //don't allow user to leave this mode
+    ui->editMode->setEnabled(false);
+    ui->resetButton->setEnabled(false);
     ui->startButton->setEnabled(false);
     ui->slowButton->setEnabled(false);
     ui->stepButton->setEnabled(false);
 
-
     ui->inputLabel->setText(QString("Input Character"));
-    while (true) {
-        QString tmpStr = ui->inputBox->text();
-        while (!submitted || tmpStr.length() - inputIndex < 1){  // loop until user clicks the submit button.
-            this->repaint();
-            qApp->processEvents();
-            tmpStr = ui->inputBox->text();
+    QString tmpStr = ui->inputBox->text();
+    while (!submitted || tmpStr.length() - inputIndex < 1){  // loop until user clicks the submit button.
+        this->repaint();
+        qApp->processEvents();
+        tmpStr = ui->inputBox->text();
 
-            //If clearing input
-            if(tmpStr.length() < inputIndex) {
-                if(submitted)
-                    ui->inputCheck->click();
-                inputIndex = 0;
-            }
+        //If clearing input
+        if(tmpStr.length() < inputIndex) {
+            if(submitted)
+                ui->inputCheck->click();
+            inputIndex = tmpStr.length();
         }
-
-        //reset the UI elements
-        ui->inputLabel->setText(QString("Input"));
-        ui->LFButton->setEnabled(false);
-        ui->startButton->setEnabled(true);
-        ui->stepButton->setEnabled(true);
-        ui->slowButton->setEnabled(true);
-
-        return tmpStr.at(inputIndex++).toLatin1();
-
-        //on a bad input, pop up a message box and try again
-        ui->inputBox->clear();
-        submitted = false;
-        QMessageBox* box = new QMessageBox(QMessageBox::Warning, QString("Invalid"), QString("Please enter a valid character."), QMessageBox::Ok, this);
-        box->exec();
     }
+
+    //reset the UI elements
+    ui->inputLabel->setText(QString("Input"));
+    ui->LFButton->setEnabled(false);
+    ui->editMode->setEnabled(true);
+    ui->resetButton->setEnabled(true);
+    ui->startButton->setEnabled(true);
+    ui->stepButton->setEnabled(true);
+    ui->slowButton->setEnabled(true);
+
+    return tmpStr.at(inputIndex++).toLatin1();
 }
 
 int MainWindow::inputInt()
@@ -308,6 +303,8 @@ int MainWindow::inputInt()
     ui->inputBox->setFocus();
 
     //don't allow user to leave this mode
+    ui->editMode->setEnabled(false);
+    ui->resetButton->setEnabled(false);
     ui->startButton->setEnabled(false);
     ui->stepButton->setEnabled(false);
     ui->slowButton->setEnabled(false);
@@ -317,10 +314,16 @@ int MainWindow::inputInt()
         while (!submitted){  // loop until user clicks the submit button.
             this->repaint();
             qApp->processEvents();
+
+            if(!running)
+                return 0;
         }
 
         //get input
         std::string tmpStr = ui->inputBox->text().toStdString();
+
+        if(submitted)
+            ui->inputCheck->click();
 
         //if the input can be interpreted as an integer
         try {
@@ -328,7 +331,8 @@ int MainWindow::inputInt()
 
             //reset the UI elements
             ui->inputLabel->setText(QString("Input"));
-            ui->LFButton->setEnabled(false);
+            ui->editMode->setEnabled(true);
+            ui->resetButton->setEnabled(true);
             ui->startButton->setEnabled(true);
             ui->stepButton->setEnabled(true);
             ui->slowButton->setEnabled(true);
@@ -504,6 +508,9 @@ void MainWindow::on_runMode_toggled(bool checked)
         breakpoints.clear();
         bool tmpModified = modified;
 
+        if(submitted)
+            ui->inputCheck->click();
+
         if (!keepRuntimeChanges) {
             ui->sourceBox->setPlainText(tmpOriginalProgram);
             ui->sourceBox->document()->setModified(tmpModified);
@@ -538,6 +545,10 @@ void MainWindow::on_runMode_toggled(bool checked)
     ui->speedLabel->setEnabled(checked);
     ui->speedSlider->setEnabled(checked);
 
+    ui->editMode->setEnabled(true);
+    ui->runMode->setEnabled(true);
+
+    ui->inputLabel->setText(QString("Input"));
     ui->startButton->setText("Start");
     ui->slowButton->setText("Slow");
 

@@ -26,7 +26,8 @@ HEADERS  += mainwindow.h \
     interpreter.h \
     clickfilter.h
 
-FORMS    += mainwindow.ui
+FORMS    += \
+    mainwindow.ui
 
 RESOURCES += \
     images.qrc
