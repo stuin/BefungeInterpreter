@@ -51,9 +51,6 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow::setWindowTitle(QString("Kagof Befunge Interpreter"));
 
     ui->sourceBox->setWordWrapMode(QTextOption::NoWrap);
-    ui->inputBox->setReadOnly(true);
-    ui->inputBox->setEnabled(false);
-    ui->sourceBox->setFocus();
 
     clickFilter = new ClickFilter(this, this);
     ui->sourceBox->viewport()->installEventFilter(clickFilter);
@@ -147,14 +144,14 @@ MainWindow::MainWindow(QWidget *parent) :
     undo = false;
     redo = false;
     copy = false;
-    slowTime = ui->speedBox->value();
+    on_speedSlider_valueChanged(ui->speedSlider->value());
 
     modified = false;
     running = false;
     started = false;
     submitted = false;
-    resettable = false;
 
+    inputIndex = 0;
 
     // create and seed a random number generator for '?'
     // the random number generator is hosted in MainWindow because the Interpreter is deleted whenever we go to edit mode.
@@ -226,14 +223,12 @@ void MainWindow::programFinished()
     this->setCursor(Qt::ArrowCursor);
     running = false;
     started = false;
-    ui->editRadioButton->setEnabled(true);
+    ui->editMode->setEnabled(true);
     ui->stepButton->setEnabled(false);
 
-    ui->startButton->setEnabled(true);
-    ui->startButton->setText("Reset");
-    resettable = true;
+    ui->resetButton->setEnabled(true);
 
-    ui->debugButton->setEnabled(false);
+    ui->startButton->setEnabled(false);
     ui->slowButton->setEnabled(false);
 
     this->repaint();
@@ -266,49 +261,32 @@ bool MainWindow::isInRunMode()
 
 char MainWindow::inputChar()
 {
-    ui->inputBox->setEnabled(true);
-    ui->inputBox->setReadOnly(false);
-    ui->inputBox->grabKeyboard();
     ui->inputBox->setFocus();
-    ui->inputSubmitButton->setEnabled(true);
     ui->LFButton->setEnabled(true);
 
     //don't allow user to leave this mode
     ui->startButton->setEnabled(false);
-    ui->debugButton->setEnabled(false);
-    ui->stepButton->setEnabled(false);
     ui->slowButton->setEnabled(false);
-    ui->editRadioButton->setEnabled(false);
+    ui->stepButton->setEnabled(false);
 
 
     ui->inputLabel->setText(QString("Input Character"));
     while (true) {
-        while (!submitted){  // loop until user clicks the submit button.
+        QString tmpStr = ui->inputBox->text();
+        while (!submitted && tmpStr.length() - inputIndex < 1){  // loop until user clicks the submit button.
             this->repaint();
             qApp->processEvents();
+            tmpStr = ui->inputBox->text();
         }
 
-        QString tmpStr = ui->inputBox->text();
+        //reset the UI elements
+        ui->inputLabel->setText(QString("Input"));
+        ui->LFButton->setEnabled(false);
+        ui->startButton->setEnabled(true);
+        ui->stepButton->setEnabled(true);
+        ui->slowButton->setEnabled(true);
 
-        //only accept strings of length 1
-        if (tmpStr.length() == 1) {
-            //reset the UI elements
-            ui->inputLabel->setText(QString("Input"));
-            ui->inputBox->clear();
-            submitted = false;
-            ui->inputBox->setEnabled(false);
-            ui->inputBox->setReadOnly(true);
-            ui->inputBox->releaseKeyboard();
-            ui->inputSubmitButton->setEnabled(false);
-            ui->LFButton->setEnabled(false);
-            ui->startButton->setEnabled(true);
-            ui->debugButton->setEnabled(true);
-            ui->stepButton->setEnabled(true);
-            ui->slowButton->setEnabled(true);
-            ui->editRadioButton->setEnabled(true);
-
-            return tmpStr.at(0).toLatin1();
-        }
+        return tmpStr.at(0).toLatin1();
 
         //on a bad input, pop up a message box and try again
         ui->inputBox->clear();
@@ -320,19 +298,12 @@ char MainWindow::inputChar()
 
 int MainWindow::inputInt()
 {
-    ui->inputBox->setEnabled(true);
-    ui->inputBox->setReadOnly(false);
-    ui->inputBox->grabKeyboard();
     ui->inputBox->setFocus();
-    ui->inputSubmitButton->setEnabled(true);
-    ui->startButton->setEnabled(false);
 
     //don't allow user to leave this mode
-    ui->debugButton->setEnabled(false);
+    ui->startButton->setEnabled(false);
     ui->stepButton->setEnabled(false);
     ui->slowButton->setEnabled(false);
-    ui->editRadioButton->setEnabled(false);
-
 
     ui->inputLabel->setText(QString("Input Integer"));
     while (true) {
@@ -350,17 +321,10 @@ int MainWindow::inputInt()
 
             //reset the UI elements
             ui->inputLabel->setText(QString("Input"));
-            ui->inputBox->clear();
-            submitted = false;
-            ui->inputBox->setEnabled(false);
-            ui->inputBox->setReadOnly(true);
-            ui->inputBox->releaseKeyboard();
-            ui->inputSubmitButton->setEnabled(false);
+            ui->LFButton->setEnabled(false);
             ui->startButton->setEnabled(true);
-            ui->debugButton->setEnabled(true);
             ui->stepButton->setEnabled(true);
             ui->slowButton->setEnabled(true);
-            ui->editRadioButton->setEnabled(true);
 
             return i;
         }
@@ -401,10 +365,10 @@ void MainWindow::on_actionLoad_File_triggered()
 /*
  * turns on/off run mode.
  * */
-void MainWindow::on_runRadioButton_toggled(bool checked)
+void MainWindow::on_runMode_toggled(bool checked)
 {
     bool tmpModified = modified;
-    ui->editRadioButton->toggled(!checked);
+    ui->editMode->toggled(!checked);
     ui->sourceBox->setReadOnly(checked);  // user can't edit the text when in run mode.
 
     //Run Mode:
@@ -428,14 +392,23 @@ void MainWindow::on_runRadioButton_toggled(bool checked)
             //find the width and height of this text
             int longest = -1;
             int current = 0;
+            int endSpaces = 0;
             int numLines = 0;
-            for (int i = 0; i < st.length(); i++){
-                if (st.at(i).toLatin1()=='\n'){
-                    if (current > longest) longest = current;
+            for (int i = 0; i < st.length(); i++) {
+                if (st.at(i).toLatin1()=='\n') {
+                    if (current - endSpaces > longest)
+                        longest = current - endSpaces;
+                    st.remove(i - endSpaces, endSpaces);
+                    endSpaces = 0;
                     current = 0;
                     numLines++;
+                } else if(st.at(i).isSpace()) {
+                    endSpaces++;
+                    current++;
+                } else {
+                    endSpaces = 0;
+                    current++;
                 }
-                else current ++;
             }
 
             //remove the trailing newline, so that the split does not create a blank line at the end
@@ -528,7 +501,6 @@ void MainWindow::on_runRadioButton_toggled(bool checked)
         tmpOriginalProgram.clear();
 
         //grab keyboard
-        ui->sourceBox->grabKeyboard();
         ui->sourceBox->setFocus();
 
         //get rid of the highlighted syntax & current PC
@@ -548,11 +520,10 @@ void MainWindow::on_runRadioButton_toggled(bool checked)
     ui->sourceBox->setUndoRedoEnabled(!checked);
 
     ui->startButton->setEnabled(checked);
-    ui->debugButton->setEnabled(checked);
+    ui->resetButton->setEnabled(checked);
     ui->stepButton->setEnabled(checked);
     ui->slowButton->setEnabled(checked);
-    ui->speedBox->setEnabled(checked);
-    ui->speedLabel->setEnabled(checked);
+    ui->speedSlider->setEnabled(checked);
 
     ui->inputLabel->setEnabled(checked);
     ui->stackLabel->setEnabled(checked);
@@ -561,7 +532,7 @@ void MainWindow::on_runRadioButton_toggled(bool checked)
 
 void MainWindow::on_sourceBox_textChanged()
 {
-    ui->runRadioButton->setEnabled(((int)ui->sourceBox->toPlainText().length() != 0));
+    ui->runMode->setEnabled(((int)ui->sourceBox->toPlainText().length() != 0));
 }
 
 void MainWindow::on_actionCopy_triggered()
@@ -692,84 +663,12 @@ void MainWindow::on_stepButton_clicked()
     ui->sourceBox->document()->setModified(tmpModified);
 }
 
-void MainWindow::on_startButton_clicked()
-{
-
-    // if resettable is true, then the start button is functioning as the reset button.
-    if (resettable) {
-        bool tmp = modified;
-        std::unordered_map<int, std::unordered_map<int, int>> tmpbp = breakpoints;
-        // toggling the "run" radio button resets the program
-        on_runRadioButton_toggled(false);
-        on_runRadioButton_toggled(true);
-        ui->sourceBox->document()->setModified(tmp);
-        breakpoints = tmpbp;
-        highlightBreakpoints();
-        ui->startButton->setText("Start");
-        resettable = false;
-        return;
-    }
-
-    if (started) {  // user clicked the stop button
-        ui->startButton->setText("Start");
-        ui->startButton->setEnabled(false);
-        this->setCursor(Qt::WaitCursor);
-        qApp->processEvents();
-        this->repaint();
-        running = false;
-        ui->outputBox->setPlainText(ui->outputBox->toPlainText().append(QString(terp->getOutputStr())));
-        ui->outputBox->moveCursor(QTextCursor::End);
-        terp->clearOutputString();
-        ui->stackBox->setPlainText(terp->stackToQString());
-        ui->startButton->setEnabled(true);
-        ui->debugButton->setEnabled(true);
-        ui->stepButton->setEnabled(true);
-        ui->editRadioButton->setEnabled(true);
-        ui->slowButton->setEnabled(true);
-        this->setCursor(Qt::ArrowCursor);
-        qApp->processEvents();
-        this->repaint();
-    }
-
-    started = !started;
-    if (started) {
-        this->setCursor(Qt::BusyCursor);
-        ui->startButton->setText("Stop");
-        ui->debugButton->setEnabled(false);
-        ui->editRadioButton->setEnabled(false);
-        ui->stepButton->setEnabled(false);
-        ui->slowButton->setEnabled(false);
-        qApp->processEvents();
-        this->repaint();
-        std::time_t startTime = std::time(0);
-        std::time_t now;
-        while (started) {
-            terp->step();
-            std::time(&now);
-            if (difftime(now, startTime) > 0.2){
-                qApp->processEvents();
-                startTime = std::time(0);
-            }
-        }
-    }
-
-    bool tmpModified = modified;
-    syntaxHighlightSource();
-    cursor = new QTextCursor(ui->sourceBox->document());
-    cursor->setPosition(torus->position());
-    cursor->setPosition(torus->position()+1, QTextCursor::KeepAnchor);
-    syntaxHighlightPC(cursor);
-    cursor->clearSelection();
-    delete cursor;
-    ui->sourceBox->document()->setModified(tmpModified);
-}
-
-void MainWindow::on_debugButton_clicked()
+void MainWindow::on_resetButton_clicked()
 {
 
     if (started) {  // user clicked the stop button or breakpoint hit
-        ui->startButton->setText("Start");
-        ui->startButton->setEnabled(false);
+        ui->resetButton->setText("Stop");
+        ui->resetButton->setEnabled(false);
         this->setCursor(Qt::WaitCursor);
         qApp->processEvents();
         this->repaint();
@@ -779,21 +678,33 @@ void MainWindow::on_debugButton_clicked()
         terp->clearOutputString();
         ui->stackBox->setPlainText(terp->stackToQString());
         ui->startButton->setEnabled(true);
-        ui->debugButton->setEnabled(true);
+        ui->resetButton->setEnabled(true);
         ui->stepButton->setEnabled(true);
-        ui->editRadioButton->setEnabled(true);
+        ui->editMode->setEnabled(true);
         ui->slowButton->setEnabled(true);
         this->setCursor(Qt::ArrowCursor);
         qApp->processEvents();
         this->repaint();
+    } else {
+        bool tmp = modified;
+        std::unordered_map<int, std::unordered_map<int, int>> tmpbp = breakpoints;
+        // toggling the "run" radio button resets the program
+        on_runMode_toggled(false);
+        on_runMode_toggled(true);
+        ui->sourceBox->document()->setModified(tmp);
+        breakpoints = tmpbp;
+        highlightBreakpoints();
     }
+}
 
+void MainWindow::on_startButton_clicked()
+{
     started = !started;
     if (started) {
         this->setCursor(Qt::BusyCursor);
-        ui->startButton->setText("Stop");
-        ui->debugButton->setEnabled(false);
-        ui->editRadioButton->setEnabled(false);
+        ui->resetButton->setText("Stop");
+        ui->startButton->setEnabled(false);
+        ui->editMode->setEnabled(false);
         ui->stepButton->setEnabled(false);
         ui->slowButton->setEnabled(false);
         qApp->processEvents();
@@ -803,7 +714,7 @@ void MainWindow::on_debugButton_clicked()
         while (started) {
             terp->step();
             if (isBreakpoint(torus->position())) {
-                on_debugButton_clicked();  // act like the debugger was paused if a breakpoint is hit
+                on_resetButton_clicked();  // act like the debugger was paused if a breakpoint is hit
                 continue;
             }
             std::time(&now);
@@ -825,16 +736,16 @@ void MainWindow::on_debugButton_clicked()
     ui->sourceBox->document()->setModified(tmpModified);
 }
 
-void MainWindow::on_speedBox_valueChanged(int arg1)
+void MainWindow::on_speedSlider_valueChanged(int arg1)
 {
-    slowTime = arg1;
+    slowTime = 151 - (arg1 * 5);
 }
 
 void MainWindow::on_slowButton_clicked()
 {
     running = !running;
     if (running) {
-        ui->editRadioButton->setEnabled(false);
+        ui->editMode->setEnabled(false);
         ui->slowButton->setText(QString("Stop"));
         while (running) {
             on_stepButton_clicked();
@@ -849,16 +760,16 @@ void MainWindow::on_slowButton_clicked()
         ui->slowButton->setText(QString("Slow"));
     }
     else {
-        ui->editRadioButton->setEnabled(true);
+        ui->editMode->setEnabled(true);
         ui->slowButton->setText(QString("Slow"));
         this->repaint();
         qApp->processEvents();
     }
 }
 
-void MainWindow::on_inputSubmitButton_clicked()
+void MainWindow::on_inputCheck_clicked()
 {
-    submitted = true;
+    submitted = !submitted;
 }
 
 void MainWindow::on_LFButton_clicked()
@@ -1309,7 +1220,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (running) running = false;
     if (started) started = false;
     if (modified){
-        if (mode == RUN) ui->editRadioButton->toggle();  // saving in run mode might save changes that were made during run, when user doesn't want that.
+        if (mode == RUN) ui->editMode->toggle();  // saving in run mode might save changes that were made during run, when user doesn't want that.
         on_actionClose_File_triggered();
     }
 

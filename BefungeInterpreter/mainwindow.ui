@@ -21,129 +21,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="7">
-     <widget class="QLabel" name="inputLabel">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="font">
-       <font>
-        <family>MS Sans Serif</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Input</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="5">
-     <widget class="QSpinBox" name="speedBox">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="font">
-       <font>
-        <family>MS Sans Serif</family>
-       </font>
-      </property>
-      <property name="accelerated">
-       <bool>true</bool>
-      </property>
-      <property name="correctionMode">
-       <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-      </property>
-      <property name="suffix">
-       <string> ms/step</string>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>500</number>
-      </property>
-      <property name="value">
-       <number>100</number>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="sourceLabel">
-      <property name="font">
-       <font>
-        <family>MS Sans Serif</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Program Source</string>
-      </property>
-     </widget>
-    </item>
-    <item row="11" column="7" colspan="5">
-     <widget class="QTextBrowser" name="outputBox">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <family>Courier New</family>
-       </font>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="4">
-     <widget class="QLabel" name="speedLabel">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="font">
-       <font>
-        <family>MS Sans Serif</family>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Speed:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="0">
-     <widget class="QPushButton" name="startButton">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Start</string>
-      </property>
-     </widget>
-    </item>
-    <item row="13" column="3">
-     <widget class="QPushButton" name="slowButton">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Slow</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" rowspan="9" colspan="6">
-     <widget class="QPlainTextEdit" name="sourceBox">
-      <property name="font">
-       <font>
-        <family>Courier New</family>
-       </font>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="10" rowspan="2">
+    <item row="5" column="19" rowspan="2">
      <spacer name="verticalSpacer_3">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -156,73 +34,66 @@
       </property>
      </spacer>
     </item>
-    <item row="12" column="0" colspan="12">
-     <widget class="Line" name="hLine">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+    <item row="3" column="19">
+     <widget class="QCheckBox" name="inputCheck">
+      <property name="text">
+       <string>On</string>
       </property>
      </widget>
     </item>
-    <item row="13" column="2">
-     <widget class="QPushButton" name="stepButton">
+    <item row="2" column="4" colspan="2">
+     <widget class="QLabel" name="sourceLabel">
+      <property name="font">
+       <font>
+        <family>MS Sans Serif</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Program Source</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="5">
+     <widget class="QPushButton" name="slowButton">
       <property name="enabled">
        <bool>false</bool>
       </property>
       <property name="text">
-       <string>Step</string>
+       <string>Slow</string>
       </property>
      </widget>
     </item>
-    <item row="7" column="7" colspan="5">
-     <widget class="QTextBrowser" name="stackBox">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="font">
-       <font>
-        <family>Courier New</family>
-       </font>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="7">
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="3" column="7" colspan="3">
-     <widget class="QLineEdit" name="inputBox">
+    <item row="3" column="20">
+     <widget class="QPushButton" name="LFButton">
       <property name="enabled">
        <bool>false</bool>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>44</height>
-       </size>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Input a new line character (ASCII value 10)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+      <property name="text">
+       <string>LineFeed</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="17">
+     <widget class="QRadioButton" name="editMode">
       <property name="font">
        <font>
-        <family>Courier New</family>
+        <family>MS Sans Serif</family>
+        <pointsize>9</pointsize>
        </font>
       </property>
-      <property name="readOnly">
+      <property name="text">
+       <string>Edit</string>
+      </property>
+      <property name="checked">
        <bool>true</bool>
       </property>
      </widget>
     </item>
-    <item row="5" column="7">
+    <item row="5" column="16">
      <widget class="QLabel" name="stackLabel">
       <property name="enabled">
        <bool>false</bool>
@@ -239,49 +110,34 @@
       </property>
      </widget>
     </item>
-    <item row="8" column="7">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="9" column="7">
-     <widget class="QLabel" name="outputLabel">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
+    <item row="14" column="20">
+     <widget class="QLabel" name="versionLabel">
       <property name="font">
        <font>
-        <family>MS Sans Serif</family>
-        <pointsize>10</pointsize>
+        <italic>true</italic>
        </font>
       </property>
       <property name="text">
-       <string>Output</string>
+       <string>Version: 1.2.0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
-    <item row="13" column="1">
-     <widget class="QPushButton" name="debugButton">
+    <item row="11" column="16" colspan="5">
+     <widget class="QTextBrowser" name="outputBox">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
-      <property name="text">
-       <string>Debug</string>
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+       </font>
       </property>
      </widget>
     </item>
-    <item row="13" column="9">
+    <item row="14" column="16">
      <widget class="QLabel" name="modeLabel">
       <property name="font">
        <font>
@@ -297,8 +153,47 @@
       </property>
      </widget>
     </item>
-    <item row="13" column="11">
-     <widget class="QRadioButton" name="runRadioButton">
+    <item row="8" column="16">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="12" column="0" colspan="21">
+     <widget class="Line" name="hLine">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="9">
+     <widget class="QSlider" name="speedSlider">
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <number>30</number>
+      </property>
+      <property name="sliderPosition">
+       <number>0</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="18">
+     <widget class="QRadioButton" name="runMode">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -313,46 +208,7 @@
       </property>
      </widget>
     </item>
-    <item row="13" column="10">
-     <widget class="QRadioButton" name="editRadioButton">
-      <property name="font">
-       <font>
-        <family>MS Sans Serif</family>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Edit</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="10">
-     <widget class="QPushButton" name="inputSubmitButton">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Submit</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="11">
-     <widget class="QPushButton" name="LFButton">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Input a new line character (ASCII value 10)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string>LineFeed</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="6" rowspan="10">
+    <item row="2" column="15" rowspan="10">
      <widget class="Line" name="vLine">
       <property name="acceptDrops">
        <bool>false</bool>
@@ -371,20 +227,148 @@
       </property>
      </widget>
     </item>
-    <item row="13" column="7" colspan="2">
-     <widget class="QLabel" name="versionLabel">
+    <item row="14" column="8">
+     <widget class="QLabel" name="speedLabel">
+      <property name="text">
+       <string>Speed:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="16">
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="7" column="16" colspan="5">
+     <widget class="QTextBrowser" name="stackBox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="font">
        <font>
-        <italic>true</italic>
+        <family>Courier New</family>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="16">
+     <widget class="QLabel" name="inputLabel">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="font">
+       <font>
+        <family>MS Sans Serif</family>
+        <pointsize>10</pointsize>
        </font>
       </property>
       <property name="text">
-       <string>Version: 1.2.0</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <string>Input</string>
       </property>
      </widget>
+    </item>
+    <item row="9" column="16">
+     <widget class="QLabel" name="outputLabel">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="font">
+       <font>
+        <family>MS Sans Serif</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Output</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" rowspan="9" colspan="15">
+     <widget class="QPlainTextEdit" name="sourceBox">
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+       </font>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="16" colspan="3">
+     <widget class="QLineEdit" name="inputBox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>44</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="4">
+     <widget class="QPushButton" name="stepButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Step</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="3">
+     <widget class="QPushButton" name="startButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="2">
+     <widget class="QPushButton" name="resetButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Reset</string>
+      </property>
+     </widget>
+    </item>
+    <item row="14" column="10">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>
@@ -394,7 +378,7 @@
      <x>0</x>
      <y>0</y>
      <width>939</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

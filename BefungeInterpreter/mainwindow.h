@@ -71,7 +71,7 @@ public:
 private slots:
     void on_actionLoad_File_triggered();
 
-    void on_runRadioButton_toggled(bool checked);
+    void on_runMode_toggled(bool checked);
 
     void on_sourceBox_textChanged();
 
@@ -105,13 +105,13 @@ private slots:
 
     void on_startButton_clicked();
 
-    void on_debugButton_clicked();
+    void on_resetButton_clicked();
 
-    void on_speedBox_valueChanged(int arg1);
+    void on_speedSlider_valueChanged(int arg1);
 
     void on_slowButton_clicked();
 
-    void on_inputSubmitButton_clicked();
+    void on_inputCheck_clicked();
 
     void on_LFButton_clicked();
 
@@ -204,7 +204,8 @@ private:
     bool running;
     bool started;
     bool submitted;
-    bool resettable;
+
+    int inputIndex;
 
     void closeEvent(QCloseEvent *event);
     void highlightBreakpoints();
