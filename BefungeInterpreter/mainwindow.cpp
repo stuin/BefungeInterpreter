@@ -273,10 +273,17 @@ char MainWindow::inputChar()
     ui->inputLabel->setText(QString("Input Character"));
     while (true) {
         QString tmpStr = ui->inputBox->text();
-        while (!submitted && tmpStr.length() - inputIndex < 1){  // loop until user clicks the submit button.
+        while (!submitted || tmpStr.length() - inputIndex < 1){  // loop until user clicks the submit button.
             this->repaint();
             qApp->processEvents();
             tmpStr = ui->inputBox->text();
+
+            //If clearing input
+            if(tmpStr.length() < inputIndex) {
+                if(submitted)
+                    ui->inputCheck->click();
+                inputIndex = 0;
+            }
         }
 
         //reset the UI elements
@@ -286,7 +293,7 @@ char MainWindow::inputChar()
         ui->stepButton->setEnabled(true);
         ui->slowButton->setEnabled(true);
 
-        return tmpStr.at(0).toLatin1();
+        return tmpStr.at(inputIndex++).toLatin1();
 
         //on a bad input, pop up a message box and try again
         ui->inputBox->clear();
@@ -368,6 +375,7 @@ void MainWindow::on_actionLoad_File_triggered()
 void MainWindow::on_runMode_toggled(bool checked)
 {
     bool tmpModified = modified;
+    running = false;
     ui->editMode->toggled(!checked);
     ui->sourceBox->setReadOnly(checked);  // user can't edit the text when in run mode.
 
@@ -482,6 +490,8 @@ void MainWindow::on_runMode_toggled(bool checked)
         ui->actionLoad_File->setEnabled(false);
         ui->actionClose_File->setEnabled(false);
 
+        inputIndex = 0;
+
     }
     else {
         //clean up
@@ -519,11 +529,17 @@ void MainWindow::on_runMode_toggled(bool checked)
     }
     ui->sourceBox->setUndoRedoEnabled(!checked);
 
-    ui->startButton->setEnabled(checked);
     ui->resetButton->setEnabled(checked);
+    ui->startButton->setEnabled(checked);
     ui->stepButton->setEnabled(checked);
     ui->slowButton->setEnabled(checked);
+    ui->inputBox->setEnabled(checked);
+    ui->inputCheck->setEnabled(checked);
+    ui->speedLabel->setEnabled(checked);
     ui->speedSlider->setEnabled(checked);
+
+    ui->startButton->setText("Start");
+    ui->slowButton->setText("Slow");
 
     ui->inputLabel->setEnabled(checked);
     ui->stackLabel->setEnabled(checked);
@@ -665,10 +681,20 @@ void MainWindow::on_stepButton_clicked()
 
 void MainWindow::on_resetButton_clicked()
 {
+    bool tmp = modified;
+    std::unordered_map<int, std::unordered_map<int, int>> tmpbp = breakpoints;
+    // toggling the "run" radio button resets the program
+    on_runMode_toggled(false);
+    on_runMode_toggled(true);
+    ui->sourceBox->document()->setModified(tmp);
+    breakpoints = tmpbp;
+    highlightBreakpoints();
+}
 
+void MainWindow::on_startButton_clicked()
+{
     if (started) {  // user clicked the stop button or breakpoint hit
-        ui->resetButton->setText("Stop");
-        ui->resetButton->setEnabled(false);
+        ui->startButton->setText("Start");
         this->setCursor(Qt::WaitCursor);
         qApp->processEvents();
         this->repaint();
@@ -685,25 +711,13 @@ void MainWindow::on_resetButton_clicked()
         this->setCursor(Qt::ArrowCursor);
         qApp->processEvents();
         this->repaint();
-    } else {
-        bool tmp = modified;
-        std::unordered_map<int, std::unordered_map<int, int>> tmpbp = breakpoints;
-        // toggling the "run" radio button resets the program
-        on_runMode_toggled(false);
-        on_runMode_toggled(true);
-        ui->sourceBox->document()->setModified(tmp);
-        breakpoints = tmpbp;
-        highlightBreakpoints();
     }
-}
 
-void MainWindow::on_startButton_clicked()
-{
     started = !started;
     if (started) {
         this->setCursor(Qt::BusyCursor);
-        ui->resetButton->setText("Stop");
-        ui->startButton->setEnabled(false);
+        ui->startButton->setText("Stop");
+        ui->resetButton->setEnabled(false);
         ui->editMode->setEnabled(false);
         ui->stepButton->setEnabled(false);
         ui->slowButton->setEnabled(false);
@@ -714,7 +728,7 @@ void MainWindow::on_startButton_clicked()
         while (started) {
             terp->step();
             if (isBreakpoint(torus->position())) {
-                on_resetButton_clicked();  // act like the debugger was paused if a breakpoint is hit
+                on_startButton_clicked();  // act like the debugger was paused if a breakpoint is hit
                 continue;
             }
             std::time(&now);
@@ -746,7 +760,10 @@ void MainWindow::on_slowButton_clicked()
     running = !running;
     if (running) {
         ui->editMode->setEnabled(false);
+        ui->startButton->setEnabled(false);
+        ui->stepButton->setEnabled(false);
         ui->slowButton->setText(QString("Stop"));
+
         while (running) {
             on_stepButton_clicked();
 
@@ -757,11 +774,13 @@ void MainWindow::on_slowButton_clicked()
             //wait for the desired amount of time
             std::this_thread::sleep_for(std::chrono::milliseconds(slowTime));
         }
-        ui->slowButton->setText(QString("Slow"));
     }
     else {
         ui->editMode->setEnabled(true);
+        ui->startButton->setEnabled(true);
+        ui->stepButton->setEnabled(true);
         ui->slowButton->setText(QString("Slow"));
+
         this->repaint();
         qApp->processEvents();
     }
