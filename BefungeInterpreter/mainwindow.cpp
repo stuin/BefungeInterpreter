@@ -342,7 +342,8 @@ int MainWindow::inputInt()
         //on a bad input, pop up a message box and try again
         catch (std::invalid_argument e){
             ui->inputBox->clear();
-            submitted = false;
+            if(submitted)
+                ui->inputCheck->click();
             QMessageBox* box = new QMessageBox(QMessageBox::Warning, QString("Invalid"), QString("Please enter a valid integer."), QMessageBox::Ok, this);
             box->exec();
         }
@@ -804,8 +805,7 @@ void MainWindow::on_inputCheck_clicked()
 
 void MainWindow::on_LFButton_clicked()
 {
-    ui->inputBox->setText(QString("\n"));
-    submitted = true;
+    ui->inputBox->setText(ui->inputBox->text().append(QString("\n")));
 }
 
 void MainWindow::on_actionIgnore_triggered(bool checked)
