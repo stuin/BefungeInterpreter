@@ -179,7 +179,11 @@
      <widget class="QPlainTextEdit" name="sourceBox">
       <property name="font">
        <font>
-        <family>Courier New</family>
+        <family>DejaVu Sans Mono</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
        </font>
       </property>
       <property name="frameShadow">
@@ -470,6 +474,17 @@
      <addaction name="menuDivision"/>
      <addaction name="menuModulus"/>
     </widget>
+    <widget class="QMenu" name="menuText_Size">
+     <property name="title">
+      <string>Text Size</string>
+     </property>
+     <addaction name="actionText9"/>
+     <addaction name="actionText10"/>
+     <addaction name="actionText12"/>
+     <addaction name="actionText14"/>
+     <addaction name="actionText16"/>
+     <addaction name="actionText18"/>
+    </widget>
     <addaction name="menuUnsupported_Chars"/>
     <addaction name="separator"/>
     <addaction name="menuDivision_Modulus_by_Zero"/>
@@ -477,6 +492,7 @@
     <addaction name="actionKeep_Padding_From_Run"/>
     <addaction name="actionKeep_Runtime_Changes"/>
     <addaction name="separator"/>
+    <addaction name="menuText_Size"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -668,6 +684,60 @@
    </property>
    <property name="toolTip">
     <string>Yes, this is a silly option. But this is what happens in the official Befunge-93 reference distribution, so I am giving the option.  Warning: if you enter this mode and perform a modulus by zero, you will lose all unsaved changes!</string>
+   </property>
+  </action>
+  <action name="actionText9">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="actionText10">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>10</string>
+   </property>
+  </action>
+  <action name="actionText12">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>12</string>
+   </property>
+  </action>
+  <action name="actionText14">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>14</string>
+   </property>
+  </action>
+  <action name="actionText16">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>16</string>
+   </property>
+  </action>
+  <action name="actionText18">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>18</string>
    </property>
   </action>
  </widget>

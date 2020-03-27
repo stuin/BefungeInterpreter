@@ -139,6 +139,20 @@ private slots:
 
     void on_actionCrash_triggered(bool checked);
 
+    void on_actionText_triggered(int size);
+
+    void on_actionText8_triggered(bool checked);
+
+    void on_actionText10_triggered(bool checked);
+
+    void on_actionText12_triggered(bool checked);
+
+    void on_actionText14_triggered(bool checked);
+
+    void on_actionText16_triggered(bool checked);
+
+    void on_actionText18_triggered(bool checked);
+
 private:
     Ui::MainWindow *ui;
 

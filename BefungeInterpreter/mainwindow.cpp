@@ -1042,6 +1042,61 @@ void MainWindow::on_actionCrash_triggered(bool checked)
     }
 }
 
+void MainWindow::on_actionText_triggered(int size) {
+    QFont font = ui->sourceBox->font();
+    font.setPointSize(size);
+    ui->sourceBox->setFont(font);
+
+    int i = 8;
+    foreach (QAction *action, ui->menuText_Size->actions()) {
+        if(size != i)
+            action->setChecked(false);
+        i += 2;
+    }
+}
+
+void MainWindow::on_actionText8_triggered(bool checked)
+{
+    if(checked) {
+        on_actionText_triggered(8);
+    }
+}
+
+void MainWindow::on_actionText10_triggered(bool checked)
+{
+    if(checked) {
+        on_actionText_triggered(10);
+    }
+}
+
+void MainWindow::on_actionText12_triggered(bool checked)
+{
+    if(checked) {
+        on_actionText_triggered(12);
+    }
+}
+
+void MainWindow::on_actionText14_triggered(bool checked)
+{
+    if(checked) {
+        on_actionText_triggered(14);
+    }
+}
+
+void MainWindow::on_actionText16_triggered(bool checked)
+{
+    if(checked) {
+        on_actionText_triggered(16);
+    }
+}
+
+void MainWindow::on_actionText18_triggered(bool checked)
+{
+    if(checked) {
+        on_actionText_triggered(18);
+    }
+}
+
 bool MainWindow::isBreakpoint(int location)
 {
     int width = torus->getWidth();
