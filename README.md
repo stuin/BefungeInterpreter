@@ -2,11 +2,9 @@
 
 <p align="center"><img src="https://github.com/kagof/BefungeInterpreter/blob/master/BefungeInterpreter/Misc/icon.ico"></p>
 
-# Current Version: 1.2.0
+# Current Version: 1.3.0
 
-A C++/QT GUI interpreter for the Befunge-93 esoteric programming language. Tested and created on Windows 10 with QT version 5.7.1 & MinGW G++ 32bit compiler 5.3.0. Developed by Karl Goffin. Released under the MIT open source license. 
-
-(c) 2016-2017 Karl Goffin.
+A C++/QT GUI interpreter for the Befunge-93 esoteric programming language. Originally tested and created on Windows 10 with QT version 5.7.1 & MinGW G++ 32bit compiler 5.3.0. Developed by Karl Goffin. Released under the MIT open source license. 
 
 ## Screenshot
 
@@ -70,12 +68,18 @@ These features should be implemented in the future:
 * Some pretty huge code refactoring is needed. Serves me right for not properly planning out the structure before I started programming this, but there is currently very high coupling between classes, and fairly low cohesion, so added any new features is becoming an increasing challenge.
 * Foreground and background threads.
 * Toggle whether to restrict playing field to 80x25 torus.
-* Persistent reset button (to reset when partway through a run)
+* ---Persistent reset button (to reset when partway through a run)---
 * customizable syntax highlighting colours, ability to turn syntax highlighting off.
-* Allow input of longer strings, taking only first character, then the next, etc.
+* ---Allow input of longer strings, taking only first character, then the next, etc.---
 * Help in the software (tooltips and/or whats this).
 
 ## Version History
+
+* Kagof Befunge-93 Interpreter v1.3.0 (WIP By Stuin)
+	- Fixed trailing spaces being included in file width
+	- Replaced speed number box with slider
+	- Combined start and debug mode
+	- Set up persistant input strings and replaced submit button with check box
 
 * Kagof Befunge-93 Interpreter v1.2.0
 	- debug mode - click characters in run mode to add breakpoint.
