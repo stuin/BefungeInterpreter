@@ -1,6 +1,7 @@
 MIT License
 
-Copyright (c) 2016 Karl Goffin
+Copyright for portions of this project are held by Karl Goffin 2016 as part of original source. 
+All other copyright for this fork are held by Stuart Irwin 2020.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
