@@ -23,6 +23,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     file.h \
     codetorus.h \
+    fileloader.h \
     interpreter.h \
     clickfilter.h
 

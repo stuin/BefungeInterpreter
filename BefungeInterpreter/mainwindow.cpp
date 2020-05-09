@@ -33,14 +33,13 @@
 #include <thread>
 #include <stdexcept>
 
-
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "file.h"
 #include "codetorus.h"
 #include "interpreter.h"
 #include "clickfilter.h"
+#include "fileloader.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -48,12 +47,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->resize(2000,1200);
-    MainWindow::setWindowTitle(QString("Kagof Befunge Interpreter"));
+    MainWindow::setWindowTitle(QString("Befunge Interpreter"));
 
     ui->sourceBox->setWordWrapMode(QTextOption::NoWrap);
 
     clickFilter = new ClickFilter(this, this);
     ui->sourceBox->viewport()->installEventFilter(clickFilter);
+
+    connect(ui->menuLoad_Recent_File, &QMenu::aboutToShow, this, &MainWindow::open_recents);
 
     // for syntax highlighting
     defaultFormat = new QTextCharFormat(ui->sourceBox->currentCharFormat());
@@ -152,6 +153,11 @@ MainWindow::MainWindow(QWidget *parent) :
     submitted = false;
 
     inputIndex = 0;
+
+    //Load settings
+    settings = new QSettings("stuintech", "Befunge Interpreter");
+    QString filePath = settings->value("openFile", "").toString();
+    loadFile(filePath);
 
     // create and seed a random number generator for '?'
     // the random number generator is hosted in MainWindow because the Interpreter is deleted whenever we go to edit mode.
@@ -357,6 +363,28 @@ int MainWindow::randomBetweenZeroAndThree()
     return val;
 }
 
+void MainWindow::loadFile(QString filepath) {
+    if(filepath != "") {
+        f = new File(this, filepath);
+        fileIsOpen = true;
+        ui->sourceBox->document()->setModified(false);
+        settings->setValue("openFile", filepath);
+
+        //Update recent file list
+        QStringList list = settings->value("recentFiles").toStringList();
+        if(list[0] != filepath) {
+            if(list.contains(filepath))
+                list.removeAll(filepath);
+
+            list.push_front(filepath);
+
+            if(list.size() > MAXRECENT)
+                list.pop_back();
+            settings->setValue("recentFiles", list);
+        }
+    }
+}
+
 
 void MainWindow::on_actionLoad_File_triggered()
 {
@@ -364,14 +392,11 @@ void MainWindow::on_actionLoad_File_triggered()
     // make sure user is OK with closing current file
     if (modified || fileIsOpen) on_actionClose_File_triggered();
 
-    QString filePath = QFileDialog::getOpenFileName(this,
+    QString filepath = QFileDialog::getOpenFileName(this,
                                                           "Select Befunge-93 source file to load",
                                                           QDir::currentPath(),
                                                           tr("Befunge file (*.bf);; Befunge-93 file (*.b93);; Text file (*.txt);;  All files (*.*)"));
-
-    f = new File(this, filePath);
-    fileIsOpen = true;
-    ui->sourceBox->document()->setModified(false);
+    loadFile(filepath);
 }
 
 /*
@@ -908,12 +933,23 @@ void MainWindow::on_actionSave_File_As_triggered()
             f->loadFile();
             ui->sourceBox->document()->setModified(false);
         }
+        settings->setValue("openFile", filepath);
+
+        //Update recent file list
+        QStringList list = settings->value("recentFiles").toStringList();
+        if(!list.contains(filepath)) {
+            list.push_front(filepath);
+            if(list.size() > MAXRECENT)
+                list.pop_back();
+            settings->setValue("recentFiles", list);
+        }
     }
     else QMessageBox::warning(this, "Error", "File failed to save.", QMessageBox::Ok, QMessageBox::Ok);
 }
 
 void MainWindow::on_actionClose_File_triggered()
 {
+    settings->setValue("openFile", "");
 
     // if the file is open
     if (fileIsOpen){
@@ -1298,6 +1334,18 @@ void MainWindow::syntaxHighlightPC(QTextCursor *cursor, bool standalone)
 
     if (standalone) ui->sourceBox->document()->setModified(tmpmodified);  // only do this if it was a standalone call
     return;
+}
+
+void MainWindow::open_recents() {
+    QMenu *menu = ui->menuLoad_Recent_File;
+    menu->clear();
+
+    QStringList list = settings->value("recentFiles").toStringList();
+    for(QString s : list) {
+        FileLoader *action = new FileLoader(s, this);
+        menu->addAction(action);
+
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

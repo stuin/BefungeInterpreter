@@ -22,6 +22,7 @@
 #include <QTextCharFormat>
 #include <QMouseEvent>
 #include <QTextCursor>
+#include <QSettings>
 #include <random>
 #include <unordered_map>
 #include <utility>
@@ -52,6 +53,7 @@ public:
     void setStackBoxText(QString s);
     void output(char c);
     void output(int i);
+    void loadFile(QString filepath);
 
     void programFinished();
     void invalidCharDialog(char c);
@@ -67,6 +69,8 @@ public:
     bool toggleBreakpoint(int location);
     void highlightBreakpoint(QTextCursor curs, bool breakpoint, bool standalone = true);
 
+public slots:
+    void open_recents();
 
 private slots:
     void on_actionLoad_File_triggered();
@@ -192,6 +196,8 @@ private:
     QTextCharFormat *invalidFormat;
     QTextCharFormat *invalidFormatPC;
 
+    QSettings *settings;
+
     QTextCursor *cursor;
 
     std::unordered_map<int, std::unordered_map<int, int>> breakpoints;
@@ -223,6 +229,8 @@ private:
 
     void closeEvent(QCloseEvent *event);
     void highlightBreakpoints();
+
+    int MAXRECENT = 10;
 };
 
 #endif // MAINWINDOW_H

@@ -403,7 +403,14 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
+    <widget class="QMenu" name="menuLoad_Recent_File">
+     <property name="title">
+      <string>Load Recent File</string>
+     </property>
+     <addaction name="actionTest"/>
+    </widget>
     <addaction name="actionLoad_File"/>
+    <addaction name="menuLoad_Recent_File"/>
     <addaction name="separator"/>
     <addaction name="actionSave_File"/>
     <addaction name="actionSave_File_As"/>
@@ -738,6 +745,11 @@
    </property>
    <property name="text">
     <string>18</string>
+   </property>
+  </action>
+  <action name="actionTest">
+   <property name="text">
+    <string>Test</string>
    </property>
   </action>
  </widget>
