@@ -145,7 +145,6 @@ MainWindow::MainWindow(QWidget *parent) :
     undo = false;
     redo = false;
     copy = false;
-    on_speedSlider_valueChanged(ui->speedSlider->value());
 
     modified = false;
     running = false;
@@ -156,8 +155,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Load settings
     settings = new QSettings("stuintech", "Befunge Interpreter");
-    QString filePath = settings->value("openFile", "").toString();
-    loadFile(filePath);
+    loadFile(settings->value("openFile", "").toString());
+    on_actionText_triggered(settings->value("textSize", 16).toInt());
+    ui->speedSlider->setValue(settings->value("speedValue", 0).toInt());
+    ui->actionKeep_Runtime_Changes->setChecked(settings->value("keepRuntime", false).toBool());
+    ui->actionKeep_Padding_From_Run->setChecked(settings->value("keepPadding", true).toBool());
+    ui->actionOverwrite_Mode->setChecked(settings->value("overwriteMode", false).toBool());
+
+    //Sync Menus
+    on_actionKeep_Runtime_Changes_triggered(ui->actionKeep_Runtime_Changes->isChecked());
+    on_actionKeep_Padding_From_Run_triggered(ui->actionKeep_Padding_From_Run->isChecked());
+    on_actionOverwrite_Mode_triggered(ui->actionOverwrite_Mode->isChecked());
 
     // create and seed a random number generator for '?'
     // the random number generator is hosted in MainWindow because the Interpreter is deleted whenever we go to edit mode.
@@ -695,6 +703,7 @@ void MainWindow::on_sourceBox_modificationChanged(bool arg1)
 void MainWindow::on_actionOverwrite_Mode_triggered(bool checked)
 {
     ui->sourceBox->setOverwriteMode(checked);
+    settings->setValue("overwriteMode", checked);
 }
 
 void MainWindow::on_stepButton_clicked()
@@ -787,9 +796,10 @@ void MainWindow::on_startButton_clicked()
     ui->sourceBox->document()->setModified(tmpModified);
 }
 
-void MainWindow::on_speedSlider_valueChanged(int arg1)
+void MainWindow::on_speedSlider_valueChanged(int value)
 {
-    slowTime = 151 - (arg1 * 5);
+    slowTime = 151 - (value * 5);
+    settings->setValue("speedValue", value);
 }
 
 void MainWindow::on_slowButton_clicked()
@@ -838,13 +848,16 @@ void MainWindow::on_actionIgnore_triggered(bool checked)
     if (checked){
         ui->actionReflect->setChecked(false);
         if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::IGNORE);
+        settings->setValue("charMode", Interpreter::IGNORE);
     }
     else {
         if (ui->actionReflect->isChecked()){
             if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::REFLECT);
+            settings->setValue("charMode", Interpreter::REFLECT);
         }
         else {
             if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::ABORT);
+            settings->setValue("charMode", Interpreter::ABORT);
         }
     }
 }
@@ -854,13 +867,16 @@ void MainWindow::on_actionReflect_triggered(bool checked)
     if (checked) {
         ui->actionIgnore->setChecked(false);
         if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::REFLECT);
+        settings->setValue("charMode", Interpreter::REFLECT);
     }
     else {
         if (ui->actionIgnore->isChecked()){
             if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::IGNORE);
+            settings->setValue("charMode", Interpreter::IGNORE);
         }
         else {
             if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::ABORT);
+            settings->setValue("charMode", Interpreter::ABORT);
         }
     }
 }
@@ -901,11 +917,13 @@ void MainWindow::on_actionSave_File_triggered()
 void MainWindow::on_actionKeep_Padding_From_Run_triggered(bool checked)
 {
     keepPadding = checked;
+    settings->setValue("keepPadding", checked);
 }
 
 void MainWindow::on_actionKeep_Runtime_Changes_triggered(bool checked)
 {
     keepRuntimeChanges = checked;
+    settings->setValue("keepRuntimeChanges", checked);
 }
 
 void MainWindow::on_actionSave_File_As_triggered()
@@ -1085,10 +1103,12 @@ void MainWindow::on_actionText_triggered(int size) {
 
     int i = 8;
     foreach (QAction *action, ui->menuText_Size->actions()) {
-        if(size != i)
-            action->setChecked(false);
+        action->setChecked(size == i);
         i += 2;
     }
+
+    //Save text size
+    settings->setValue("textSize", size);
 }
 
 void MainWindow::on_actionText8_triggered(bool checked)
