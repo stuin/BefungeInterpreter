@@ -153,19 +153,55 @@ MainWindow::MainWindow(QWidget *parent) :
 
     inputIndex = 0;
 
+    //Link action groups
+    QActionGroup *groupUnsupported_Chars = new QActionGroup(this);
+    groupUnsupported_Chars->addAction(ui->actionAbort);
+    groupUnsupported_Chars->addAction(ui->actionIgnore);
+    groupUnsupported_Chars->addAction(ui->actionReflect);
+    connect(groupUnsupported_Chars, &QActionGroup::triggered, this, &MainWindow::on_actionUnsupported_triggered);
+
+    QActionGroup *groupDivision_Zero = new QActionGroup(this);
+    groupDivision_Zero->addAction(ui->actionAsk_For_Input);
+    groupDivision_Zero->addAction(ui->actionPush_Zero);
+    connect(groupDivision_Zero, &QActionGroup::triggered, this, &MainWindow::on_actionDivision_Zero);
+
+    QActionGroup *groupModulus_Zero = new QActionGroup(this);
+    groupModulus_Zero->addAction(ui->actionAsk_For_Input_2);
+    groupModulus_Zero->addAction(ui->actionPush_Zero_2);
+    groupModulus_Zero->addAction(ui->actionCrash_2);
+    connect(groupModulus_Zero, &QActionGroup::triggered, this, &MainWindow::on_actionModulus_Zero);
+
+    QActionGroup *groupText_Size = new QActionGroup(this);
+    groupText_Size->addAction(ui->actionText8);
+    groupText_Size->addAction(ui->actionText10);
+    groupText_Size->addAction(ui->actionText12);
+    groupText_Size->addAction(ui->actionText14);
+    groupText_Size->addAction(ui->actionText16);
+    groupText_Size->addAction(ui->actionText18);
+    connect(groupText_Size, &QActionGroup::triggered, this, &MainWindow::on_actionText_triggered);
+
     //Load settings
     settings = new QSettings("stuintech", "Befunge Interpreter");
     loadFile(settings->value("openFile", "").toString());
-    on_actionText_triggered(settings->value("textSize", 16).toInt());
     ui->speedSlider->setValue(settings->value("speedValue", 0).toInt());
     ui->actionKeep_Runtime_Changes->setChecked(settings->value("keepRuntime", false).toBool());
     ui->actionKeep_Padding_From_Run->setChecked(settings->value("keepPadding", true).toBool());
     ui->actionOverwrite_Mode->setChecked(settings->value("overwriteMode", false).toBool());
 
+    //Set groups
+    groupUnsupported_Chars->actions().at(settings->value("charMode", 0).toInt())->setChecked(true);
+    groupDivision_Zero->actions().at(settings->value("divisionZero", 0).toInt())->setChecked(true);
+    groupModulus_Zero->actions().at(settings->value("modulusZero", 0).toInt())->setChecked(true);
+    groupText_Size->actions().at(settings->value("textSize", 0).toInt())->setChecked(true);
+
     //Sync Menus
     on_actionKeep_Runtime_Changes_triggered(ui->actionKeep_Runtime_Changes->isChecked());
     on_actionKeep_Padding_From_Run_triggered(ui->actionKeep_Padding_From_Run->isChecked());
     on_actionOverwrite_Mode_triggered(ui->actionOverwrite_Mode->isChecked());
+    on_actionUnsupported_triggered(groupUnsupported_Chars->checkedAction());
+    on_actionDivision_Zero(groupDivision_Zero->checkedAction());
+    on_actionModulus_Zero(groupModulus_Zero->checkedAction());
+    on_actionText_triggered(groupText_Size->checkedAction());
 
     // create and seed a random number generator for '?'
     // the random number generator is hosted in MainWindow because the Interpreter is deleted whenever we go to edit mode.
@@ -503,7 +539,7 @@ void MainWindow::on_runMode_toggled(bool checked)
         //set the division & modulus by zero mode (constructor defaults to ASK for both)
         if (ui->actionPush_Zero->isChecked()) terp->setDivZeroMode(Interpreter::PUSHZERO);
         if (ui->actionPush_Zero_2->isChecked()) terp->setModZeroMode(Interpreter::PUSHZERO);
-        if (ui->actionCrash->isChecked()) terp->setModZeroMode(Interpreter::CRASH);
+        if (ui->actionCrash_2->isChecked()) terp->setModZeroMode(Interpreter::CRASH);
 
         syntaxHighlightSource();
 
@@ -843,41 +879,17 @@ void MainWindow::on_LFButton_clicked()
     ui->inputBox->setText(ui->inputBox->text().append(QString("\n")));
 }
 
-void MainWindow::on_actionIgnore_triggered(bool checked)
+void MainWindow::on_actionUnsupported_triggered(QAction *action)
 {
-    if (checked){
-        ui->actionReflect->setChecked(false);
+    if(action == ui->actionIgnore) {
         if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::IGNORE);
         settings->setValue("charMode", Interpreter::IGNORE);
-    }
-    else {
-        if (ui->actionReflect->isChecked()){
-            if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::REFLECT);
-            settings->setValue("charMode", Interpreter::REFLECT);
-        }
-        else {
-            if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::ABORT);
-            settings->setValue("charMode", Interpreter::ABORT);
-        }
-    }
-}
-
-void MainWindow::on_actionReflect_triggered(bool checked)
-{
-    if (checked) {
-        ui->actionIgnore->setChecked(false);
+    } else if (action == ui->actionReflect) {
         if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::REFLECT);
         settings->setValue("charMode", Interpreter::REFLECT);
-    }
-    else {
-        if (ui->actionIgnore->isChecked()){
-            if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::IGNORE);
-            settings->setValue("charMode", Interpreter::IGNORE);
-        }
-        else {
-            if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::ABORT);
-            settings->setValue("charMode", Interpreter::ABORT);
-        }
+    } else {
+        if (mode == RUN) terp->setUnsupportedCharMode(Interpreter::ABORT);
+        settings->setValue("charMode", Interpreter::ABORT);
     }
 }
 
@@ -1033,124 +1045,37 @@ void MainWindow::on_actionClose_File_triggered()
     }
 }
 
-void MainWindow::on_actionAsk_For_Input_triggered(bool checked)
-{
-    if (checked) {
-        ui->actionPush_Zero->setChecked(false);
-        if (mode == RUN) terp->setDivZeroMode(Interpreter::ASK);
-    }
-    else {
-        ui->actionAsk_For_Input->setChecked(true);  // this is the default option, so the only way to uncheck is by selecting the other option.
-        on_actionAsk_For_Input_triggered(true);
-    }
-}
-
-void MainWindow::on_actionPush_Zero_triggered(bool checked)
-{
-    if (checked) {
-        ui->actionAsk_For_Input->setChecked(false);
-        if (mode == RUN) terp->setDivZeroMode(Interpreter::PUSHZERO);
-    }
-    else {
-        ui->actionAsk_For_Input->setChecked(true);
-        on_actionAsk_For_Input_triggered(true);
+void MainWindow::on_actionDivision_Zero(QAction *action) {
+    if(action == ui->actionAsk_For_Input) {
+        if(mode == RUN) terp->setDivZeroMode(Interpreter::ASK);
+        settings->setValue("divisionZero", Interpreter::ASK);
+    } else if(action == ui->actionPush_Zero) {
+        if(mode == RUN) terp->setDivZeroMode(Interpreter::PUSHZERO);
+        settings->setValue("divisionZero", Interpreter::PUSHZERO);
+    } else {
+        if(mode == RUN) terp->setDivZeroMode(Interpreter::CRASH);
+        settings->setValue("divisionZero", Interpreter::CRASH);
     }
 }
 
-void MainWindow::on_actionAsk_For_Input_2_triggered(bool checked)
-{
-    if (checked) {
-        ui->actionPush_Zero_2->setChecked(false);
-        ui->actionCrash->setChecked(false);
-        if (mode == RUN) terp->setModZeroMode(Interpreter::ASK);
-    }
-    else {
-        ui->actionAsk_For_Input_2->setChecked(true);  // this is the default option, so the only way to uncheck is by selecting another option.
-        on_actionAsk_For_Input_2_triggered(true);
-    }
-}
-
-void MainWindow::on_actionPush_Zero_2_triggered(bool checked)
-{
-    if (checked) {
-        ui->actionAsk_For_Input_2->setChecked(false);
-        ui->actionCrash->setChecked(false);
-        if (mode == RUN) terp->setModZeroMode(Interpreter::PUSHZERO);
-    }
-    else {
-        ui->actionAsk_For_Input_2->setChecked(true);
-        on_actionAsk_For_Input_2_triggered(true);
+void MainWindow::on_actionModulus_Zero(QAction *action) {
+    if(action == ui->actionAsk_For_Input_2) {
+        if(mode == RUN) terp->setModZeroMode(Interpreter::ASK);
+        settings->setValue("modulusZero", Interpreter::ASK);
+    } else if(action == ui->actionPush_Zero_2) {
+        if(mode == RUN) terp->setModZeroMode(Interpreter::PUSHZERO);
+        settings->setValue("modulusZero", Interpreter::PUSHZERO);
+    } else {
+        if(mode == RUN) terp->setModZeroMode(Interpreter::CRASH);
+        settings->setValue("modulusZero", Interpreter::CRASH);
     }
 }
 
-void MainWindow::on_actionCrash_triggered(bool checked)
-{
-    if (checked) {
-        ui->actionAsk_For_Input_2->setChecked(false);
-        ui->actionPush_Zero_2->setChecked(false);
-        if (mode == RUN) terp->setModZeroMode(Interpreter::CRASH);
-    }
-    else {
-        ui->actionAsk_For_Input_2->setChecked(true);
-        on_actionAsk_For_Input_2_triggered(true);
-    }
-}
-
-void MainWindow::on_actionText_triggered(int size) {
+void MainWindow::on_actionText_triggered(QAction *action) {
     QFont font = ui->sourceBox->font();
-    font.setPointSize(size);
+    font.setPointSize(action->text().toInt());
     ui->sourceBox->setFont(font);
-
-    int i = 8;
-    foreach (QAction *action, ui->menuText_Size->actions()) {
-        action->setChecked(size == i);
-        i += 2;
-    }
-
-    //Save text size
-    settings->setValue("textSize", size);
-}
-
-void MainWindow::on_actionText8_triggered(bool checked)
-{
-    if(checked) {
-        on_actionText_triggered(8);
-    }
-}
-
-void MainWindow::on_actionText10_triggered(bool checked)
-{
-    if(checked) {
-        on_actionText_triggered(10);
-    }
-}
-
-void MainWindow::on_actionText12_triggered(bool checked)
-{
-    if(checked) {
-        on_actionText_triggered(12);
-    }
-}
-
-void MainWindow::on_actionText14_triggered(bool checked)
-{
-    if(checked) {
-        on_actionText_triggered(14);
-    }
-}
-
-void MainWindow::on_actionText16_triggered(bool checked)
-{
-    if(checked) {
-        on_actionText_triggered(16);
-    }
-}
-
-void MainWindow::on_actionText18_triggered(bool checked)
-{
-    if(checked) {
-        on_actionText_triggered(18);
-    }
+    settings->setValue("textSize", (action->text().toInt() - 8) / 2);
 }
 
 bool MainWindow::isBreakpoint(int location)

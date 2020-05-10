@@ -447,6 +447,7 @@
      <property name="toolTipsVisible">
       <bool>true</bool>
      </property>
+     <addaction name="actionAbort"/>
      <addaction name="actionIgnore"/>
      <addaction name="actionReflect"/>
     </widget>
@@ -476,7 +477,7 @@
       </property>
       <addaction name="actionAsk_For_Input_2"/>
       <addaction name="actionPush_Zero_2"/>
-      <addaction name="actionCrash"/>
+      <addaction name="actionCrash_2"/>
      </widget>
      <addaction name="menuDivision"/>
      <addaction name="menuModulus"/>
@@ -485,7 +486,7 @@
      <property name="title">
       <string>Text Size</string>
      </property>
-     <addaction name="actionText9"/>
+     <addaction name="actionText8"/>
      <addaction name="actionText10"/>
      <addaction name="actionText12"/>
      <addaction name="actionText14"/>
@@ -649,7 +650,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Ask For Input</string>
@@ -668,7 +669,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Ask For Input</string>
@@ -682,7 +683,7 @@
     <string>Push Zero</string>
    </property>
   </action>
-  <action name="actionCrash">
+  <action name="actionCrash_2">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -693,7 +694,7 @@
     <string>Yes, this is a silly option. But this is what happens in the official Befunge-93 reference distribution, so I am giving the option.  Warning: if you enter this mode and perform a modulus by zero, you will lose all unsaved changes!</string>
    </property>
   </action>
-  <action name="actionText9">
+  <action name="actionText8">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -750,6 +751,28 @@
   <action name="actionTest">
    <property name="text">
     <string>Test</string>
+   </property>
+  </action>
+  <action name="actionAbort">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Abort</string>
+   </property>
+  </action>
+  <action name="actionCrash">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Crash</string>
    </property>
   </action>
  </widget>

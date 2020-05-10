@@ -119,9 +119,7 @@ private slots:
 
     void on_LFButton_clicked();
 
-    void on_actionIgnore_triggered(bool checked);
-
-    void on_actionReflect_triggered(bool checked);
+    void on_actionUnsupported_triggered(QAction *action);
 
     void on_actionSave_File_triggered();
 
@@ -133,29 +131,11 @@ private slots:
 
     void on_actionClose_File_triggered();
 
-    void on_actionAsk_For_Input_triggered(bool checked);
+    void on_actionDivision_Zero(QAction *action);
 
-    void on_actionPush_Zero_triggered(bool checked);
+    void on_actionModulus_Zero(QAction *action);
 
-    void on_actionAsk_For_Input_2_triggered(bool checked);
-
-    void on_actionPush_Zero_2_triggered(bool checked);
-
-    void on_actionCrash_triggered(bool checked);
-
-    void on_actionText_triggered(int size);
-
-    void on_actionText8_triggered(bool checked);
-
-    void on_actionText10_triggered(bool checked);
-
-    void on_actionText12_triggered(bool checked);
-
-    void on_actionText14_triggered(bool checked);
-
-    void on_actionText16_triggered(bool checked);
-
-    void on_actionText18_triggered(bool checked);
+    void on_actionText_triggered(QAction *action);
 
 private:
     Ui::MainWindow *ui;
